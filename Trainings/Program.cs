@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Media;
+using System.Timers;
 
 namespace Trainings
 {
@@ -6,7 +8,8 @@ namespace Trainings
     {
         static void Main(string[] args)
         {
-            ExtensionMethodDemo();
+            //ExtensionMethodDemo();
+            EventsOnTimerDemo();
         }
 
         static void ExtensionMethodDemo()
@@ -19,6 +22,29 @@ namespace Trainings
                 today = today.AddDays(8);
             }
             Console.ReadLine();
+        }
+
+        static void EventsOnTimerDemo()
+        {
+            var myTimer = new Timer();
+            myTimer.Interval = 1000;
+            myTimer.Elapsed += PrimaryEvent;
+            myTimer.Elapsed += SecondEvent;
+            myTimer.Start();
+            Console.ReadLine();
+        }
+
+        private static void SecondEvent(object sender, ElapsedEventArgs e)
+        {
+            if (e.SignalTime.Second % 5 == 0)
+            {
+                Console.Beep(440, 500);
+            }
+        }
+
+        private static void PrimaryEvent(object sender, ElapsedEventArgs e)
+        {
+            Console.WriteLine(e.SignalTime);
         }
     }
 }
