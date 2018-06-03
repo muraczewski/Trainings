@@ -1,0 +1,6 @@
+﻿namespace Trainings
+{
+    class ListWrapper
+    {
+    }
+}

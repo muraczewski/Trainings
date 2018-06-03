@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Media;
+using System.IO;
 using System.Timers;
 
 namespace Trainings
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //ExtensionMethodDemo();
-            EventsOnTimerDemo();
+            //EventsOnTimerDemo();
+            MusicPlayerDemo(MusicPlayerMode.Mp3);
+            //MusicPlayerDemo(MusicPlayerMode.Bytes);
         }
 
-        static void ExtensionMethodDemo()
+        private static void ExtensionMethodDemo()
         {
             var today = DateTime.Today;
 
@@ -24,27 +26,49 @@ namespace Trainings
             Console.ReadLine();
         }
 
-        static void EventsOnTimerDemo()
+        private static void EventsOnTimerDemo()
         {
             var myTimer = new Timer();
             myTimer.Interval = 1000;
-            myTimer.Elapsed += PrimaryEvent;
-            myTimer.Elapsed += SecondEvent;
+            myTimer.Elapsed += Events.PrimaryEvent;
+            myTimer.Elapsed += Events.SecondEvent;
             myTimer.Start();
             Console.ReadLine();
         }
 
-        private static void SecondEvent(object sender, ElapsedEventArgs e)
+        private static void MusicPlayerDemo(MusicPlayerMode musicPlayerMode)
         {
-            if (e.SignalTime.Second % 5 == 0)
-            {
-                Console.Beep(440, 500);
-            }
-        }
+            const string fileName = "simple_audio.mp3";
+            MusicPlayer musicPlayer = new MusicPlayer();
 
-        private static void PrimaryEvent(object sender, ElapsedEventArgs e)
-        {
-            Console.WriteLine(e.SignalTime);
+            switch (musicPlayerMode)
+            {
+                case MusicPlayerMode.Mp3:
+                    musicPlayer = new MusicPlayer(fileName);
+                    break;
+                case MusicPlayerMode.Bytes:
+                    var bytes = File.ReadAllBytes(fileName);
+                    musicPlayer = new MusicPlayer(bytes);
+                    break;
+                case MusicPlayerMode.Stream:
+                    musicPlayer = new MusicPlayer(Stream.Null);
+                    break;
+            }
+
+            var delay = 4000;
+
+            musicPlayer.Play();
+            System.Threading.Thread.Sleep(delay);
+            musicPlayer.Pause();
+            System.Threading.Thread.Sleep(delay);
+            musicPlayer.Play();
+            System.Threading.Thread.Sleep(delay);
+            musicPlayer.Stop();
+            System.Threading.Thread.Sleep(delay);
+            musicPlayer.Play();
+            System.Threading.Thread.Sleep(delay);
+            musicPlayer.Closed();
+            Console.ReadKey();
         }
     }
 }
