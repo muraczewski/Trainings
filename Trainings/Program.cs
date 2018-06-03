@@ -10,8 +10,9 @@ namespace Trainings
         {
             //ExtensionMethodDemo();
             //EventsOnTimerDemo();
-            MusicPlayerDemo(MusicPlayerMode.Mp3);
+            //MusicPlayerDemo(MusicPlayerMode.Mp3);
             //MusicPlayerDemo(MusicPlayerMode.Bytes);
+            MusicPlayerDemo(MusicPlayerMode.Stream);
         }
 
         private static void ExtensionMethodDemo()
@@ -51,7 +52,8 @@ namespace Trainings
                     musicPlayer = new MusicPlayer(bytes);
                     break;
                 case MusicPlayerMode.Stream:
-                    musicPlayer = new MusicPlayer(Stream.Null);
+                    var stream = File.OpenRead(fileName);
+                    musicPlayer = new MusicPlayer(stream);
                     break;
             }
 
