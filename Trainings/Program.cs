@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Timers;
 
@@ -12,7 +13,8 @@ namespace Trainings
             //EventsOnTimerDemo();
             //MusicPlayerDemo(MusicPlayerMode.Mp3);
             //MusicPlayerDemo(MusicPlayerMode.Bytes);
-            MusicPlayerDemo(MusicPlayerMode.Stream);
+            //MusicPlayerDemo(MusicPlayerMode.Stream);
+            SerializationDemo();
         }
 
         private static void ExtensionMethodDemo()
@@ -40,7 +42,7 @@ namespace Trainings
         private static void MusicPlayerDemo(MusicPlayerMode musicPlayerMode)
         {
             const string fileName = "simple_audio.mp3";
-            MusicPlayer musicPlayer = new MusicPlayer();
+            IMusicPlayer musicPlayer = new MusicPlayer();
 
             switch (musicPlayerMode)
             {
@@ -70,6 +72,23 @@ namespace Trainings
             musicPlayer.Play();
             System.Threading.Thread.Sleep(delay);
             musicPlayer.Closed();
+            Console.ReadKey();
+        }
+
+        private static void SerializationDemo()
+        {
+            var person = new Person(1, "Adam", "Nowak", 30, 80, 180);
+            var cars = new List<Car>
+            {
+                new Car("ford", "mondeo", 2003),
+                new Car("ford", "focus", 2006)
+            };
+            person.Cars = cars;
+
+            XmlSerialization.Save(person, "person.xml");
+            var savedPerson = (Person)XmlSerialization.Load("person.xml");
+            Console.WriteLine($"Are the same objects (by reference)? {person == savedPerson}");
+            Console.WriteLine($"Are the same objects (by value)? {person.ToString() == savedPerson.ToString()}" );
             Console.ReadKey();
         }
     }
