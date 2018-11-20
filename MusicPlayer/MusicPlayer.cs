@@ -3,14 +3,16 @@ using System.IO;
 using NAudio.Wave;
 using NLayer.NAudioSupport;
 
-namespace Trainings
+namespace MusicPlayer
 {
-    public class MusicPlayer : IMusicPlayer, IDisposable
+    public class MusicPlayer : IDisposable
     {
+        private bool _disposed = false;
+
         private readonly Mp3FileReader _mp3FileReader;
         private readonly WaveOut _waveOut;
         private readonly Stream _stream;
-
+        
         public MusicPlayer()
         {
         }
@@ -71,9 +73,24 @@ namespace Trainings
 
         public void Dispose()
         {
-            _waveOut.Dispose();
-            _mp3FileReader.Dispose();
-            _stream?.Dispose();
+            this.CleanUp(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void CleanUp(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    _waveOut.Dispose();
+                    _mp3FileReader.Dispose();
+                    _stream?.Dispose();
+                }
+            }
+
+            _disposed = true;
         }
     }
 }
+
