@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Timers;
 
-namespace Trainings
+namespace TimerEvents
 {
     public static class Events
     {

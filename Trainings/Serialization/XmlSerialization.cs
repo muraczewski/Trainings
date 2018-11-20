@@ -2,11 +2,11 @@
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Trainings
+namespace Serialization
 {
     public static class XmlSerialization
     {
-        public static void Save(Person person, string fileName)
+        public static void SerializeToFile(Person person, string fileName)
         {
             var xmlSerializer = new XmlSerializer(typeof(Person));
 
@@ -18,7 +18,7 @@ namespace Trainings
             Console.WriteLine("Save succeed");
         }
 
-        public static object Load(string fileName)
+        public static object DeserializeFromFile(string fileName)
         {
             var xmlSerializer = new XmlSerializer(typeof(Person));
 

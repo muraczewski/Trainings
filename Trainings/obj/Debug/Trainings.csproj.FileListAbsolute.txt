@@ -1,1 +1,6 @@
 C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\bin\Debug\Trainings.exe.config
+C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\bin\Debug\Trainings.exe
+C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\bin\Debug\Trainings.pdb
+C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\obj\Debug\Trainings.csprojResolveAssemblyReference.cache
+C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\obj\Debug\Trainings.exe
+C:\Users\Grzegorz\Source\Repos\Trainings\Trainings\obj\Debug\Trainings.pdb
