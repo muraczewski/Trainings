@@ -7,24 +7,26 @@ namespace CoreTrainings.Controllers
     [Route("api/[controller]")]
     public class ConcurrentBagController : Controller
     {
+        private readonly ConcurrentBagService _concurrentBagService = ConcurrentBagService.Instance;
+
         [HttpPost]
         [Route("quickAdd")]
         public async Task AddParticipantWithoutDelayAsync(string participantName)
         {
-            await ConcurrentBagService.AddParticipantAsync(participantName, 0);
+            await _concurrentBagService.AddParticipantAsync(participantName, 0);
         }
 
         [HttpPost]
         [Route("longAdd")]
         public async Task AddParticipantWithDelayAsync(string participantName)
         {
-            await ConcurrentBagService.AddParticipantAsync(participantName, CommonService.LongSleepTime);
+            await _concurrentBagService.AddParticipantAsync(participantName, CommonService.LongSleepTime);
         }
 
         [HttpGet]
         public async Task<string> GetParticipantAsync()
         {
-            var result = await ConcurrentBagService.GetParticipantAsync(CommonService.LongSleepTime);
+            var result = await _concurrentBagService.GetParticipantAsync(CommonService.LongSleepTime);
             return result;
         }
     }

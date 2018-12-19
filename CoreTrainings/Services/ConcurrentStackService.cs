@@ -3,25 +3,50 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public static class ConcurrentStackService
+    public sealed class ConcurrentStackService
     {
+        private static ConcurrentStackService _instance = null;
+        private static readonly object m_Sync = new object();
         private static ConcurrentStack<string> stack;
 
-        public static async Task AddElementAsync(string name, int sleepTime)
+        private ConcurrentStackService()
+        {
+        }
+
+        public static ConcurrentStackService Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (m_Sync)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new ConcurrentStackService();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+        public async Task AddElementAsync(string name, int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
             stack.Push(name);
         }
 
-        public static async Task AddElementsAsync(string[] names, int sleepTime)
+        public async Task AddElementsAsync(string[] names, int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
             stack.PushRange(names);
         }
 
-        public static async Task<string> GetLastElementAsync(int sleepTime)
+        public async Task<string> GetLastElementAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
@@ -32,7 +57,7 @@ namespace Services
             return string.Empty;
         }
 
-        public static async Task<string> GetAndDeleteLastElementAsync(int sleepTime)
+        public async Task<string> GetAndDeleteLastElementAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 

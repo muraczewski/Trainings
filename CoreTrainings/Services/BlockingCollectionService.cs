@@ -33,8 +33,6 @@ namespace Services
             }
         }
 
-
-
         public async Task AddParticipantAsync(string participantName, int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
