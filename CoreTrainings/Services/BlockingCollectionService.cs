@@ -3,22 +3,50 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public static class BlockingCollectionService
+    public sealed class BlockingCollectionService
     {
-        private static BlockingCollection<string> participantWithLimit = new BlockingCollection<string>(3);
+        private static BlockingCollectionService _instance = null;
+        private static readonly object m_Sync = new object();
+        private static BlockingCollection<string> _participantWithLimit = null;
 
-        public static async Task AddParticipantAsync(string participantName, int sleepTime)
+        private BlockingCollectionService()
         {
-            await CommonService.WaitInThread(sleepTime);
-
-            participantWithLimit.Add(participantName);
+            _participantWithLimit = new BlockingCollection<string>(3);
         }
 
-        public static async Task<BlockingCollection<string>> GetParticipantsAsync(int sleepTime)
+        public static BlockingCollectionService Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (m_Sync)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new BlockingCollectionService();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+
+
+        public async Task AddParticipantAsync(string participantName, int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
-            return participantWithLimit;
+            _participantWithLimit.Add(participantName);
+        }
+
+        public async Task<BlockingCollection<string>> GetParticipantsAsync(int sleepTime)
+        {
+            await CommonService.WaitInThread(sleepTime);
+
+            return _participantWithLimit;
         }
     }
 }
