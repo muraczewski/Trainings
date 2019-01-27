@@ -8,24 +8,26 @@ namespace CoreTrainings.Controllers
     [Route("api/[controller]")]
     public class BlockingCollectionController : Controller
     {
+        private readonly BlockingCollectionService _blockingCollectionService = BlockingCollectionService.Instance;
+
         [HttpPost]
         [Route("quickAdd")]
-        public async Task AddParticipanWithoutDelaytAsync(string participantName)
+        public async Task AddParticipantWithoutDelayAsync(string participantName)
         {
-            await BlockingCollectionService.AddParticipantAsync(participantName, 0);
+            await _blockingCollectionService.AddParticipantAsync(participantName, 0);
         }
 
         [HttpPost]
         [Route("longAdd")]
         public async Task AddParticipantWithDelayAsync(string participantName)
         {
-            await BlockingCollectionService.AddParticipantAsync(participantName, CommonService.LongSleepTime);
+            await _blockingCollectionService.AddParticipantAsync(participantName, CommonService.LongSleepTime);
         }
 
         [HttpGet]
         public async Task<BlockingCollection<string>> GetParticipantsAsync()
         {
-            var result = await BlockingCollectionService.GetParticipantsAsync(CommonService.LongSleepTime);
+            var result = await _blockingCollectionService.GetParticipantsAsync(CommonService.LongSleepTime);
             return result;
         }
     }

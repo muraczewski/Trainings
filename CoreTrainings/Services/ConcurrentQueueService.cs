@@ -3,17 +3,42 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public static class ConcurrentQueueService
+    public sealed class ConcurrentQueueService
     {
+        private static ConcurrentQueueService _instance = null;
+        private static readonly object m_Sync = new object();
         private static ConcurrentQueue<string> queue;
 
-        public static async Task AddElementAsync(string name, int sleepTime)
+        private ConcurrentQueueService()
+        {
+        }
+
+        public static ConcurrentQueueService Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (m_Sync)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new ConcurrentQueueService();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+        public async Task AddElementAsync(string name, int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
             queue.Enqueue(name);
         }
 
-        public static async Task<string> GetFirstElementAsync(int sleepTime)
+        public async Task<string> GetFirstElementAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
@@ -25,7 +50,7 @@ namespace Services
             return string.Empty;
         }
 
-        public static async Task<string> GetAndDeleteFirstElementAsync(int sleepTime)
+        public async Task<string> GetAndDeleteFirstElementAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 

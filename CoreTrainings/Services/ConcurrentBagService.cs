@@ -3,21 +3,46 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public static class ConcurrentBagService
+    public sealed class ConcurrentBagService
     {
-        private static ConcurrentBag<string> participants;
+        private static ConcurrentBagService _instance = null;
+        private static readonly object m_Sync = new object();
+        private static ConcurrentBag<string> _participants;
 
-        public static async Task AddParticipantAsync(string participantName, int sleepTime)
+        private ConcurrentBagService()
         {
-            await CommonService.WaitInThread(sleepTime);
-            participants.Add(participantName);
         }
 
-        public static  async Task<string> GetAndDeleteParticipantAsync(int sleepTime)
+        public static ConcurrentBagService Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (m_Sync)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new ConcurrentBagService();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+        public async Task AddParticipantAsync(string participantName, int sleepTime)
+        {
+            await CommonService.WaitInThread(sleepTime);
+            _participants.Add(participantName);
+        }
+
+        public async Task<string> GetAndDeleteParticipantAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
-            if (participants.TryTake(out string participant))
+            if (_participants.TryTake(out string participant))
             {
                 return participant;
             }
@@ -25,11 +50,11 @@ namespace Services
             return string.Empty;
         }
 
-        public static async Task<string> GetParticipantAsync(int sleepTime)
+        public async Task<string> GetParticipantAsync(int sleepTime)
         {
             await CommonService.WaitInThread(sleepTime);
 
-            if (participants.TryPeek(out string participant))
+            if (_participants.TryPeek(out string participant))
             {
                 return participant;
             }

@@ -5,7 +5,7 @@ namespace Services
 {
     public static class CommonService
     {
-        public const int LongSleepTime = 20000;
+        public const int LongSleepTime = 10000;
 
         public static async Task WaitInThread(int sleepTime)
         {

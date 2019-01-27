@@ -7,25 +7,27 @@ namespace CoreTrainings.Controllers
     [Route("api/[controller]")]
     public class ConcurrentQueueController : Controller
     {
+        private readonly ConcurrentQueueService _concurrentQueueService = ConcurrentQueueService.Instance;
+
         [HttpPost]
         [Route("quickAdd")]
         public async Task AddElementWithoutDelayAsync(string name)
         {
-            await ConcurrentQueueService.AddElementAsync(name, 0);
+            await _concurrentQueueService.AddElementAsync(name, 0);
         }
 
         [HttpPost]
         [Route("longAdd")]
         public async Task AddElementWithDelayAsync(string name)
         {
-            await ConcurrentQueueService.AddElementAsync(name, CommonService.LongSleepTime);
+            await _concurrentQueueService.AddElementAsync(name, CommonService.LongSleepTime);
         }
 
         [HttpGet]
         [Route("FirstElement")]
         public async Task<string> GetFirstElementAsync()
         {
-            var result = await ConcurrentQueueService.GetFirstElementAsync(CommonService.LongSleepTime);
+            var result = await _concurrentQueueService.GetFirstElementAsync(CommonService.LongSleepTime);
             return result;
         }
 
@@ -33,7 +35,7 @@ namespace CoreTrainings.Controllers
         [Route("FirstElementWithDeleting")]
         public async Task<string> GetAndDeleteFirstElementAsync()
         {
-            var result = await ConcurrentQueueService.GetAndDeleteFirstElementAsync(CommonService.LongSleepTime);
+            var result = await _concurrentQueueService.GetAndDeleteFirstElementAsync(CommonService.LongSleepTime);
             return result;
         }
     }
