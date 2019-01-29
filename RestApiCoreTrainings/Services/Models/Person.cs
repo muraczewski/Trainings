@@ -2,6 +2,10 @@
 {
     public class Person
     {
+        public Person()
+        {
+        }
+
         public Person(int id)
         {
             Id = id;

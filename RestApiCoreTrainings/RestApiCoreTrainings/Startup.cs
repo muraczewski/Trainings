@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
-using RestApiCoreTrainings.Authorization;
 using Swashbuckle.AspNetCore.Swagger;
 using RestApiCoreTrainings.Filters;
 using Microsoft.Extensions.Logging;
@@ -23,20 +22,28 @@ namespace RestApiCoreTrainings
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+
             services.AddMvc(options =>
             {
-                options.Filters.Add(new LogExceptionFilter(LoggerFactoryExtensions.CreateLogger<LogExceptionFilter>(new LoggerFactory())));
-                options.Filters.Add(new LogAsyncExceptionFilter(LoggerFactoryExtensions.CreateLogger<LogAsyncExceptionFilter>(new LoggerFactory())));
-                options.Filters.Add(new LogActionFilter(LoggerFactoryExtensions.CreateLogger<LogActionFilter>(new LoggerFactory())));
-                options.Filters.Add(new LogAsyncActionFilter(LoggerFactoryExtensions.CreateLogger<LogAsyncActionFilter>(new LoggerFactory())));
+                options.Filters.Add(new LogExceptionFilter(loggerFactory.CreateLogger<LogExceptionFilter>()));
+                options.Filters.Add(new LogAsyncExceptionFilter(loggerFactory.CreateLogger<LogAsyncExceptionFilter>()));
+                options.Filters.Add(new LogActionFilter(loggerFactory.CreateLogger<LogActionFilter>()));
+                options.Filters.Add(new LogAsyncActionFilter(loggerFactory.CreateLogger<LogAsyncActionFilter>()));
             });
 
             services.AddSingleton<IPersonService, PersonService>();
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("AtLeast18", policy => policy.Requirements.Add(new MinimumAgeRequirement(18)));
-            });
+/*            services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("AtLeast18", policy =>
+                    {
+                        //policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                        policy.Requirements.Add(new MinimumAgeRequirement(18));
+                    });
+                });*/
 
             services.AddSwaggerGen(c =>
             {
