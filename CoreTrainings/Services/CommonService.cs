@@ -7,9 +7,10 @@ namespace Services
     {
         public const int LongSleepTime = 10000;
 
-        public static async Task WaitInThread(int sleepTime)
+        public static Task WaitInThread(int sleepTime)
         {
-            await Task.Run(() => Thread.Sleep(sleepTime));
+            return Task.Delay(sleepTime);
+
         }
     }
 }

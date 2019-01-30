@@ -19,9 +19,10 @@ namespace CoreTrainings.Controllers
 
         [HttpPost]
         [Route("longAdd")]
-        public async Task AddParticipantWithDelayAsync(string participantName)
+        public async Task<IActionResult> AddParticipantWithDelayAsync(string participantName)
         {
             await _blockingCollectionService.AddParticipantAsync(participantName, CommonService.LongSleepTime);
+            return NoContent();
         }
 
         [HttpGet]

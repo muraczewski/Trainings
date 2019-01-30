@@ -11,9 +11,9 @@ namespace CoreTrainings.Controllers
 
         [HttpPost]
         [Route("quickAdd")]
-        public async Task AddParticipantWithoutDelayAsync(string participantName)
+        public Task AddParticipantWithoutDelayAsync(string participantName)
         {
-            await _concurrentBagService.AddParticipantAsync(participantName, 0);
+            return _concurrentBagService.AddParticipantAsync(participantName, 0);
         }
 
         [HttpPost]
