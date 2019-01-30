@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RestApiCoreTrainings.Controllers
 {
     [Produces("application/json")]
+    [Authorize]
     [Route("api/Person")]
     public class PersonController : Controller
     {
@@ -17,7 +19,7 @@ namespace RestApiCoreTrainings.Controllers
         }
 
         [HttpPost("addPerson")]
-        //[Authorize(Policy = "AtLeast18")]
+        [Authorize(Policy = "AtLeast18")]
         public async Task<ActionResult> Post([FromBody]Person person)
         {
             var isSuccess = await _personService.TryAddPersonAsync(person);
@@ -72,7 +74,7 @@ namespace RestApiCoreTrainings.Controllers
         }
 
         // TODO check what's going on with argument
-        [HttpGet("getPerson/{id?}")]
+        [HttpGet("getPerson2/{id?}")]
         public async Task<ActionResult> GetAnyPersonIfNotSpecify(int id = 0)
         {
             var person = await Task.Run(() => _personService.GetPerson(id));
