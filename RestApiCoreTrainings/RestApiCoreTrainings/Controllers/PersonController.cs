@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,36 +20,61 @@ namespace RestApiCoreTrainings.Controllers
         //[Authorize(Policy = "AtLeast18")]
         public async Task<ActionResult> Post([FromBody]Person person)
         {
-            await Task.Run(() => { _personService.TryAddPersonAsync(person); });
-            return Ok();
+            var isSuccess = await _personService.TryAddPersonAsync(person);
+
+            if (isSuccess)
+            {
+                return Ok();
+            }
+
+            return BadRequest("Person with the same Id already exists");
         }
 
         [HttpPut("updatePerson")]
         //[Authorize(Policy = "AtLeast18")]
         public async Task<ActionResult> Put(Person person)
         {
-            await Task.Run(() => { _personService.TryUpdatePersonAsync(person); });
-            return Ok();
+            var isSuccess = await _personService.TryUpdatePersonAsync(person);
+
+            if (isSuccess)
+            {
+                return Ok();
+            }
+
+            return BadRequest("Update person failed");
         }
 
         [HttpDelete("deletePerson/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            await Task.Run(() => { _personService.TryRemovePersonAsync(id); });
-            return Ok();
+            var isSuccess = await _personService.TryRemovePersonAsync(id);
+
+            if (isSuccess)
+            {
+                return Ok();
+            }
+
+            return BadRequest("Delete person failed");
         }
 
-        [HttpGet("getPeople/{showDeleted?}")]                  
-        public async Task<ActionResult> GetAll(bool showDeleted = false)
+        [HttpGet("getPeople")]                  
+        public async Task<ActionResult> GetAll()
         {
             var people = await Task.Run(() => _personService.GetPeople());
             return Ok(people);
         }
 
-        [HttpGet("getPerson/{id}")]
+        [HttpGet("getPerson/{id:int}")]
         public async Task<ActionResult> GetById(int id)
         {
-            throw new NullReferenceException();
+            var person = await Task.Run(() => _personService.GetPerson(id));
+            return Ok(person);
+        }
+
+        // TODO check what's going on with argument
+        [HttpGet("getPerson/{id?}")]
+        public async Task<ActionResult> GetAnyPersonIfNotSpecify(int id = 0)
+        {
             var person = await Task.Run(() => _personService.GetPerson(id));
             return Ok(person);
         }

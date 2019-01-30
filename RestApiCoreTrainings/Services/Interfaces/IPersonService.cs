@@ -6,11 +6,11 @@ namespace BusinessLayer.Interfaces
 {
     public interface IPersonService
     {
-        Task TryAddPersonAsync(Person person);
+        Task<bool> TryAddPersonAsync(Person person);
 
-        Task TryUpdatePersonAsync(Person person);
+        Task<bool> TryUpdatePersonAsync(Person person);
 
-        Task TryRemovePersonAsync(int personId);
+        Task<bool> TryRemovePersonAsync(int personId);
 
         Task AddOrUpdatePersonAsync(Person person);
 

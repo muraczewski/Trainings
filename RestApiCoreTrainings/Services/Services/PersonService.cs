@@ -30,19 +30,30 @@ namespace BusinessLayer.Services
             return person;
         }
 
-        public async Task TryAddPersonAsync(Person person)
+        public async Task<bool> TryAddPersonAsync(Person person)
         {
-            await Task.Run(() => _people.TryAdd(person.Id, person)); 
+            var isSuccess = false;
+            await Task.Run(() => isSuccess = _people.TryAdd(person.Id, person));
+
+            return isSuccess;
         }
 
-        public async Task TryRemovePersonAsync(int personId)
+        public async Task<bool> TryRemovePersonAsync(int personId)
         {
-            await Task.Run(() => _people.TryRemove(personId, out Person removedPerson));
+            var isSuccess = false;
+            await Task.Run(() => isSuccess = _people.TryRemove(personId, out Person removedPerson));
+
+            return isSuccess;
         }
 
-        public async Task TryUpdatePersonAsync(Person person)
+        public async Task<bool> TryUpdatePersonAsync(Person person)
         {
-            await Task.Run(() => _people.TryAdd(person.Id, person));
+            var isSuccess = false;
+
+            _people.TryGetValue(person.Id, out var comparisonValue);
+            await Task.Run(() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue));
+
+            return isSuccess;
         }
     }
 }
