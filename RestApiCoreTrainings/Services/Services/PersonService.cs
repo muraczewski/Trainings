@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -14,9 +15,9 @@ namespace BusinessLayer.Services
             _people = new ConcurrentDictionary<int, Person>();
         }
 
-        public async Task AddOrUpdatePersonAsync(Person person)
+        public async Task AddOrUpdatePersonAsync(Person person, CancellationToken cancellationToken)
         {
-            await Task.Run(() => _people.AddOrUpdate(person.Id, person, null));
+            await Task.Run(() => _people.AddOrUpdate(person.Id, person, null), cancellationToken);
         }
 
         public ConcurrentDictionary<int, Person> GetPeople()
@@ -30,30 +31,30 @@ namespace BusinessLayer.Services
             return person;
         }
 
-        public async Task<bool> TryAddPersonAsync(Person person)
+        public async Task<bool> TryAddPersonAsync(Person person, CancellationToken cancellationToken)
         {
             var isSuccess = false;
-            await Task.Run(() => isSuccess = _people.TryAdd(person.Id, person));
+            await Task.Run(() => isSuccess = _people.TryAdd(person.Id, person), cancellationToken);
 
             return isSuccess;
         }
 
-        public async Task<bool> TryRemovePersonAsync(int personId)
+        public async Task<bool> TryRemovePersonAsync(int personId, CancellationToken cancellationToken)
         {
             var isSuccess = false;
-            await Task.Run(() => isSuccess = _people.TryRemove(personId, out Person removedPerson));
+            await Task.Run(() => isSuccess = _people.TryRemove(personId, out Person removedPerson), cancellationToken);
 
             return isSuccess;
         }
 
-        public async Task<bool> TryUpdatePersonAsync(Person person)
+        public async Task<bool> TryUpdatePersonAsync(Person person, CancellationToken cancellationToken)
         {
-            var isSuccess = false;
-
             _people.TryGetValue(person.Id, out var comparisonValue);
-            await Task.Run(() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue));
 
-            return isSuccess;
+            var isSuccess = false;
+            await Task.Run((() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue)), cancellationToken);
+
+            return await Task.FromResult(isSuccess);
         }
     }
 }

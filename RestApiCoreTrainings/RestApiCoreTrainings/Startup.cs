@@ -31,7 +31,8 @@ namespace RestApiCoreTrainings
             services.AddMvc(options =>
             {
                 options.Filters.Add(new LogExceptionFilter(loggerFactory.CreateLogger<LogExceptionFilter>()));
-                options.Filters.Add(new LogAsyncExceptionFilter(loggerFactory.CreateLogger<LogAsyncExceptionFilter>()));
+                 // options.Filters.Add<ILogger<LogAsyncExceptionFilter, loggerFactory.CreateLogger(<LogAsyncExceptionFilter>)>
+                //options.Filters.Add(new LogAsyncExceptionFilter(loggerFactory.CreateLogger<LogAsyncExceptionFilter>()));
                 options.Filters.Add(new LogActionFilter(loggerFactory.CreateLogger<LogActionFilter>()));
                 options.Filters.Add(new LogAsyncActionFilter(loggerFactory.CreateLogger<LogAsyncActionFilter>()));
             });
