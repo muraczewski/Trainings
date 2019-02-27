@@ -20,5 +20,7 @@ namespace BusinessLayer.Interfaces
         Person GetPerson(int id);
 
         PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5);
+
+        Task<bool> UpdateSurnameAsync(int id, string surname, CancellationToken cancellationToken);
     }
 }

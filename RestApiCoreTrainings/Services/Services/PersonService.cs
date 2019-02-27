@@ -73,5 +73,25 @@ namespace BusinessLayer.Services
             var result = pagedResult.GetPage(_peopleToTestPagination, pageIndex, pageSize);
             return result;
         }
+
+        public async Task<bool> UpdateSurnameAsync(int id, string surname, CancellationToken cancellationToken)
+        {
+            try
+            {
+                _people.TryGetValue(id, out var comparisonValue);
+                _people.TryGetValue(id, out var person);
+
+                person.Surname = surname;
+
+                var isSuccess = false;
+                await Task.Run((() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue)), cancellationToken);
+
+                return await Task.FromResult(isSuccess);
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
+        }
     }
 }

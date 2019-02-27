@@ -131,5 +131,20 @@ namespace RestApiCoreTrainings.Controllers
 
             return Ok(person);
         }
+
+        [HttpPatch]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> Patch(CancellationToken cancellationToken, int id, string surname)
+        {
+            var isSuccess = await _personService.UpdateSurnameAsync(id, surname, cancellationToken);
+
+            if (isSuccess)
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Update surname failed");
+        }
     }
 }
