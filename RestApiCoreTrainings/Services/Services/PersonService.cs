@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,9 +11,17 @@ namespace BusinessLayer.Services
     {
         private readonly ConcurrentDictionary<int, Person> _people;
 
+        private readonly List<Person>_peopleToTestPagination;
+
         public PersonService()
         {
             _people = new ConcurrentDictionary<int, Person>();
+            _peopleToTestPagination = new List<Person>();
+
+            for (int i = 1; i < 20; i++)
+            {
+                _peopleToTestPagination.Add(new Person(i));
+            }
         }
 
         public async Task AddOrUpdatePersonAsync(Person person, CancellationToken cancellationToken)
@@ -27,6 +36,7 @@ namespace BusinessLayer.Services
 
         public Person GetPerson(int id)
         {
+            // TODO It couldn't be GetOrAdd
             var person = _people.GetOrAdd(id, new Person(id));
             return person;
         }
@@ -55,6 +65,13 @@ namespace BusinessLayer.Services
             await Task.Run((() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue)), cancellationToken);
 
             return await Task.FromResult(isSuccess);
+        }
+
+        public PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5)
+        {
+            var pagedResult = new PagedList<Person>(_peopleToTestPagination, pageIndex, pageSize);
+            var result = pagedResult.GetPage(_peopleToTestPagination, pageIndex, pageSize);
+            return result;
         }
     }
 }

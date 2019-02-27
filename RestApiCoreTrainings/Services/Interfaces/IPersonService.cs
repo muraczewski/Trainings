@@ -18,5 +18,7 @@ namespace BusinessLayer.Interfaces
         ConcurrentDictionary<int, Person> GetPeople();
 
         Person GetPerson(int id);
+
+        PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5);
     }
 }
