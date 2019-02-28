@@ -99,7 +99,7 @@ namespace RestApiCoreTrainings.Controllers
                 return NoContent();
             }
 
-            return Ok(pagedPeople);
+            return Ok(new { pagedPeople.PageIndex, pagedPeople.TotalPages, pagedPeople.HasNextPage, pagedPeople.HasPreviousPage, pagedPeople, });
         }
 
 

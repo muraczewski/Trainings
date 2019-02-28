@@ -10,10 +10,10 @@ namespace BusinessLayer.Models
 
         public int TotalPages { get; set; }
 
-        public PagedList(List<T> items, int pageIndex, int pageSize)
+        public PagedList(List<T> items, int count, int pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
-            TotalPages = (int)Math.Ceiling(items.Count / (double)pageSize);
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         
             this.AddRange(items);
         }
@@ -22,13 +22,14 @@ namespace BusinessLayer.Models
 
         public bool HasNextPage => PageIndex < TotalPages;
 
-        public PagedList<T> GetPage(List<T> source, int pageIndex, int pageSize)
+        public static PagedList<T> GetPage(List<T> source, int pageIndex, int pageSize)
         {
             var itemsToSkip = (pageIndex - 1) * pageSize;
+            var count = source.Count;
 
             var items = source.Skip(itemsToSkip).Take(pageSize).ToList();
 
-            return new PagedList<T>(items, pageIndex, pageSize);          
+            return new PagedList<T>(items, count, pageIndex, pageSize);          
         }
     }
 }

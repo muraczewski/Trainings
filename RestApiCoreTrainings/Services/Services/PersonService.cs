@@ -69,8 +69,8 @@ namespace BusinessLayer.Services
 
         public PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5)
         {
-            var pagedResult = new PagedList<Person>(_peopleToTestPagination, pageIndex, pageSize);
-            var result = pagedResult.GetPage(_peopleToTestPagination, pageIndex, pageSize);
+            var result = PagedList<Person>.GetPage(_peopleToTestPagination, pageIndex, pageSize);
+
             return result;
         }
 
