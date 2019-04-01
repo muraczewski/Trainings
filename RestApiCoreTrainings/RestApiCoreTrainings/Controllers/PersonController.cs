@@ -3,13 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RestApiCoreTrainings.Controllers
 {
     [Produces("application/json")]
-    //[Authorize]
     [Route("api/people")]
     public class PersonController : Controller
     {
@@ -23,7 +21,6 @@ namespace RestApiCoreTrainings.Controllers
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        //[Authorize(Policy = "AtLeast18")]
         public async Task<IActionResult> Post([FromBody]Person person, CancellationToken cancellationToken)
         {
             var isSuccess = await _personService.TryAddPersonAsync(person, cancellationToken);
@@ -31,9 +28,7 @@ namespace RestApiCoreTrainings.Controllers
             if (isSuccess)
             {
                 return NoContent();
-                //TODO should be NoContent 
-                //TODO or better: CreatedAtAction to GET
-                // If Ok is empty then should be NoContent instead
+                // TODO it could be CreatedAtAction e.g. to GetById or GetAll
             }
 
             return BadRequest("Person with the same Id already exists");
@@ -42,7 +37,6 @@ namespace RestApiCoreTrainings.Controllers
         [HttpPut]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        //[Authorize(Policy = "AtLeast18")]
         public async Task<ActionResult> Put(Person person, CancellationToken cancellationToken)
         {
             var isSuccess = await _personService.TryUpdatePersonAsync(person, cancellationToken);
@@ -70,60 +64,95 @@ namespace RestApiCoreTrainings.Controllers
             return BadRequest("Delete person failed");
         }
 
-        [HttpGet]
+        [HttpGet("Pagination_InServiceLayer")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult> GetPeople(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
         {
-            var people = await Task.Run(() => _personService.GetPeople(), cancellationToken);
+            var pagedResult = await _personService.GetPeopleAsync(pageIndex, pageSize, cancellationToken);
 
-            if (people.IsEmpty)
+            if (pagedResult.TotalItems == 0)
             {
                 return NoContent();
             }
 
-            return Ok(people);
+            return Ok(new
+            {
+                pagedResult.TotalItems,
+                pagedResult.TotalPages,
+                pagedResult.PageIndex,
+                pagedResult.HasPreviousPage,
+                pagedResult.HasNextPage,
+                pagedResult.Items
+            });
         }
 
-        [HttpGet("paged")]
+        [HttpGet("Pagination_InPagedResult")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public ActionResult GetPagedPeople(CancellationToken cancellationToken, int pageIndex = 1)
+        public async Task<ActionResult> GetPeople2(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
         {
-            var pagedPeople = _personService.GetPagedPeople(pageIndex);
+            var pagedResult = await _personService.GetPeopleAsync2(pageIndex, pageSize, cancellationToken);
 
-            if (pagedPeople.Count == 0)
+            if (pagedResult.TotalItems == 0)
             {
                 return NoContent();
             }
 
-            return Ok(new { pagedPeople.PageIndex, pagedPeople.TotalPages, pagedPeople.HasNextPage, pagedPeople.HasPreviousPage, pagedPeople, });
+            return Ok(new
+            {
+                pagedResult.TotalItems,
+                pagedResult.TotalPages,
+                pagedResult.PageIndex,
+                pagedResult.HasPreviousPage,
+                pagedResult.HasNextPage,
+                pagedResult.Items
+            });
         }
 
+        [HttpGet("Pagination_InControllerLayer")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> GetPeople3(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
+        {
+            if (pageIndex == null)
+            {
+                var allPeople = await _personService.GetPeopleAsync(cancellationToken);
+                if (allPeople.Count == 0)
+                {
+                    return NoContent();
+                }
+
+                return Ok(allPeople);
+            }
+
+            var pagedResult = await _personService.GetPeopleAsync(pageIndex, pageSize, cancellationToken);
+
+            if (pagedResult.TotalItems == 0)
+            {
+                return NoContent();
+            }
+
+            return Ok(new
+            {
+                pagedResult.TotalItems,
+                pagedResult.TotalPages,
+                pagedResult.PageIndex,
+                pagedResult.HasPreviousPage,
+                pagedResult.HasNextPage,
+                pagedResult.Items
+            });
+        }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public async Task<ActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var person = await Task.Run(() => _personService.GetPerson(id), cancellationToken);
-            if (person == null)
-            {
-                return NoContent();
-            }
-
-            return Ok(person);
-        }
-
-        [HttpGet("GetPerson")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<ActionResult> GetAnyPersonIfNotSpecify(CancellationToken cancellationToken, [FromQuery]int id = 0)
-        {
-            var person = await Task.Run(() => _personService.GetPerson(id), cancellationToken);
-
+            var person = await _personService.GetPersonAsync(id, cancellationToken);
             if (person == null)
             {
                 return NoContent();

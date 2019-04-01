@@ -2,6 +2,7 @@
 using BusinessLayer.Models;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,34 +12,25 @@ namespace BusinessLayer.Services
     {
         private readonly ConcurrentDictionary<int, Person> _people;
 
-        private readonly List<Person>_peopleToTestPagination;
-
         public PersonService()
         {
             _people = new ConcurrentDictionary<int, Person>();
-            _peopleToTestPagination = new List<Person>();
 
             for (int i = 1; i < 20; i++)
             {
-                _peopleToTestPagination.Add(new Person(i));
+                _people.TryAdd(i, new Person(i));
             }
         }
 
         public async Task AddOrUpdatePersonAsync(Person person, CancellationToken cancellationToken)
         {
-            await Task.Run(() => _people.AddOrUpdate(person.Id, person, null), cancellationToken);
+            await Task.Run(() => _people.AddOrUpdate(person.Id, person, null));            
         }
 
-        public ConcurrentDictionary<int, Person> GetPeople()
+        public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken)
         {
-            return _people;      
-        }
-
-        public Person GetPerson(int id)
-        {
-            // TODO It couldn't be GetOrAdd
-            var person = _people.GetOrAdd(id, new Person(id));
-            return person;
+            var person = _people.GetValueOrDefault(id);
+            return await Task.FromResult(person);
         }
 
         public async Task<bool> TryAddPersonAsync(Person person, CancellationToken cancellationToken)
@@ -61,17 +53,9 @@ namespace BusinessLayer.Services
         {
             _people.TryGetValue(person.Id, out var comparisonValue);
 
-            var isSuccess = false;
-            await Task.Run((() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue)), cancellationToken);
+            var isSuccess = _people.TryUpdate(person.Id, person, comparisonValue);
 
             return await Task.FromResult(isSuccess);
-        }
-
-        public PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5)
-        {
-            var result = PagedList<Person>.GetPage(_peopleToTestPagination, pageIndex, pageSize);
-
-            return result;
         }
 
         public async Task<bool> UpdateSurnameAsync(int id, string surname, CancellationToken cancellationToken)
@@ -83,8 +67,7 @@ namespace BusinessLayer.Services
 
                 person.Surname = surname;
 
-                var isSuccess = false;
-                await Task.Run((() => isSuccess = _people.TryUpdate(person.Id, person, comparisonValue)), cancellationToken);
+                var isSuccess = _people.TryUpdate(person.Id, person, comparisonValue);
 
                 return await Task.FromResult(isSuccess);
             }
@@ -92,6 +75,31 @@ namespace BusinessLayer.Services
             {
                 return false;
             }
+        }
+
+
+        public async Task<PagedList<Person>> GetPeopleAsync(int? pageIndex, int pageSize, CancellationToken cancellationToken)
+        {
+            if (pageIndex == null)
+            {
+                var allPeople = PagedList<Person>.GetPage(_people.Values, 1, _people.Count);
+                return await Task.FromResult(allPeople);
+            }
+
+            var onePage = PagedList<Person>.GetPage(_people.Values, pageIndex.Value, pageSize);
+            return await Task.FromResult(onePage);
+        }
+
+        public async Task<PagedList2<Person>> GetPeopleAsync2(int? pageIndex, int pageSize, CancellationToken cancellationToken)
+        {
+            var pagedResult = PagedList2<Person>.GetPage(_people.Values, pageIndex.Value, pageSize);
+            return await Task.FromResult(pagedResult);
+        }
+
+        public async Task<List<Person>> GetPeopleAsync(CancellationToken cancellationToken)
+        {
+            var result = _people.Values.ToList();
+            return await Task.FromResult(result);
         }
     }
 }
