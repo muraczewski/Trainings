@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using RestApiCoreTrainings.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using Microsoft.Extensions.Logging.Console;
 
 namespace RestApiCoreTrainings
 {
@@ -37,8 +38,6 @@ namespace RestApiCoreTrainings
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
-
-            services.AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,10 +56,8 @@ namespace RestApiCoreTrainings
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            loggerFactory.AddConsole();
-            loggerFactory.AddDebug();
-
-            var logger = loggerFactory.CreateLogger<DebugLogger>();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            var logger = loggerFactory.CreateLogger<ConsoleLogger>();
             logger.LogInformation("Logger configured successfully");
         }
     }
