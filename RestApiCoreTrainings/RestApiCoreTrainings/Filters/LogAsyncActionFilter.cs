@@ -15,11 +15,11 @@ namespace RestApiCoreTrainings.Filters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            _logger.LogInformation($"Start of action {context.HttpContext.Request.Path}");
+            _logger.LogInformation($"Start of async action {context.HttpContext.Request.Path}");
 
             var resultContext = await next();
 
-            _logger.LogInformation($"End of action {context.HttpContext.Request.Path}");
+            _logger.LogInformation($"End of async action {context.HttpContext.Request.Path}");
         }
     }
 }

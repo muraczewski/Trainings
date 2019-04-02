@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,8 @@ using BusinessLayer.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using RestApiCoreTrainings.Filters;
 using Microsoft.Extensions.Logging;
-using RestApiCoreTrainings.Authorization;
+using Microsoft.Extensions.Logging.Debug;
+using Microsoft.Extensions.Logging.Console;
 
 namespace RestApiCoreTrainings
 {
@@ -24,39 +24,24 @@ namespace RestApiCoreTrainings
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             services.AddMvc(options =>
             {
-                options.Filters.Add(new LogExceptionFilter(loggerFactory.CreateLogger<LogExceptionFilter>()));
-                 // options.Filters.Add<ILogger<LogAsyncExceptionFilter, loggerFactory.CreateLogger(<LogAsyncExceptionFilter>)>
-                //options.Filters.Add(new LogAsyncExceptionFilter(loggerFactory.CreateLogger<LogAsyncExceptionFilter>()));
-                options.Filters.Add(new LogActionFilter(loggerFactory.CreateLogger<LogActionFilter>()));
-                options.Filters.Add(new LogAsyncActionFilter(loggerFactory.CreateLogger<LogAsyncActionFilter>()));
+                options.Filters.Add<LogExceptionFilter>();
+                options.Filters.Add<LogAsyncExceptionFilter>();
+                options.Filters.Add<LogActionFilter>();
+                options.Filters.Add<LogAsyncActionFilter>();
             });
 
             services.AddSingleton<IPersonService, PersonService>();
-
-            services.AddAuthorization(options =>
-                {
-                    options.AddPolicy("AtLeast18", policy =>
-                    {
-                        policy.Requirements.Add(new MinimumAgeRequirement(18));
-                    });
-                });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
-
-            services.AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -70,6 +55,10 @@ namespace RestApiCoreTrainings
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
+
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            var logger = loggerFactory.CreateLogger<ConsoleLogger>();
+            logger.LogInformation("Logger configured successfully");
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using BusinessLayer.Models;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,11 +15,13 @@ namespace BusinessLayer.Interfaces
 
         Task AddOrUpdatePersonAsync(Person person, CancellationToken cancellationToken);
 
-        ConcurrentDictionary<int, Person> GetPeople();
+        Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken);
 
-        Person GetPerson(int id);
+        Task<PagedList<Person>> GetPeopleAsync(int? pageIndex, int pageSize, CancellationToken cancellationToken);
 
-        PagedList<Person> GetPagedPeople(int pageIndex, int pageSize = 5);
+        Task<PagedList2<Person>> GetPeopleAsync2(int? pageIndex, int pageSize, CancellationToken cancellationToken);
+        
+        Task<List<Person>> GetPeopleAsync(CancellationToken cancellationToken);
 
         Task<bool> UpdateSurnameAsync(int id, string surname, CancellationToken cancellationToken);
     }

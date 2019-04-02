@@ -4,17 +4,17 @@ using System.Linq;
 
 namespace BusinessLayer.Models
 {
-    public class PagedList<T> : List<T>
+    public class PagedList2<T> : List<T>
     {
         public ICollection<T> Items { get; set; }
 
-        public int PageIndex { get; set; }
+        public int? PageIndex { get; set; }
 
         public int TotalPages { get; set; }
 
         public int TotalItems { get; set; }
 
-        public PagedList(List<T> items, int count, int pageIndex, int pageSize)
+        public PagedList2(ICollection<T> items, int count, int? pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
             TotalItems = count;
@@ -27,14 +27,19 @@ namespace BusinessLayer.Models
 
         public bool HasNextPage => PageIndex < TotalPages;
 
-        public static PagedList<T> GetPage(ICollection<T> items, int pageIndex, int pageSize)
+        public static PagedList2<T> GetPage(ICollection<T> items, int? pageIndex, int pageSize)
         {
-            var itemsToSkip = (pageIndex - 1) * pageSize;
+            if (pageIndex == null)
+            {
+                return new PagedList2<T>(items, items.Count, 1, items.Count);
+            }
+
+            var itemsToSkip = (pageIndex.Value - 1) * pageSize;
             var count = items.Count;
 
             var result = items.Skip(itemsToSkip).Take(pageSize).ToList();
 
-            return new PagedList<T>(result, count, pageIndex, pageSize);          
+            return new PagedList2<T>(result, count, pageIndex, pageSize);          
         }
     }
 }
