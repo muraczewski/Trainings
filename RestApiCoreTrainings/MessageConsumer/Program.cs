@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Amazon;
-using Amazon.SQS;
-using Amazon.SQS.Model;
+using Common;
 
 namespace MessageConsumer
 {
@@ -10,16 +9,15 @@ namespace MessageConsumer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("******************************************");
-            Console.WriteLine("Amazon SQS");
-            Console.WriteLine("******************************************\n");
-            var sqs = new AmazonSQSClient(RegionEndpoint.EUCentral1);
+            List<string> Recipients = new List<string>
+            {
+                "grzegorz.muraczewski@gmail.com"
+            };
 
-            var queueUrl = sqs.GetQueueUrlAsync("gmuraczewski-queue").Result.QueueUrl;
+        var sqs = new AmazonSQSClientWrapper(RegionEndpoint.EUCentral1, "gmuraczewski-queue"); // TODO move gmuraczewski-queue to config
+            Console.WriteLine("AWS SQS Consumer");
 
-            var receiveMessageRequest = new ReceiveMessageRequest(queueUrl);            
-
-            var receivedMessageResponse = sqs.ReceiveMessageAsync(receiveMessageRequest).Result.Messages.FirstOrDefault();   
+            var receivedMessageResponse = sqs.ReceiveMessage();
 
             if (receivedMessageResponse == null)
             {
@@ -29,10 +27,18 @@ namespace MessageConsumer
             var pasteBinWrapper = new PastebinWrapper();
             var paste = pasteBinWrapper.CreateBin(receivedMessageResponse.Body);
 
-            // TODO send email with paste.Url;
+            var sesClient = new AmazonSESCLientWrapper(RegionEndpoint.EUWest1, "gmuraczewski@pgs-soft.com");
+            var response = sesClient.SendMessage(Recipients, "New bin on pastebin was added", paste.Url, new System.Threading.CancellationToken());
 
-            var deleteMessageRequest = new DeleteMessageRequest(queueUrl, receivedMessageResponse.ReceiptHandle);
-            sqs.DeleteMessageAsync(deleteMessageRequest);        
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine("Email sent succesfully");
+                sqs.DeleteMessage(receivedMessageResponse.ReceiptHandle);
+            }
+            else
+            {
+                Console.WriteLine("Problem with sending email");
+            }
 
             Console.ReadKey();
         }
