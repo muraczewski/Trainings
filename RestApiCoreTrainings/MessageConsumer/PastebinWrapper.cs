@@ -1,4 +1,5 @@
 ﻿using PastebinAPI;
+using System.Threading.Tasks;
 
 namespace MessageConsumer
 {
@@ -9,11 +10,11 @@ namespace MessageConsumer
             Pastebin.DevKey = "8bb7b8fdda2ffda487d119edb9751634";   // TODO  move to config
         }
 
-        public Paste CreateBin(string message)
+        public async Task<Paste> CreateBinAsync(string message)
         {
-            var user = Pastebin.LoginAsync("grzegorzmuraczewski", "password").Result; // TODO move to config
+            var user = await Pastebin.LoginAsync("grzegorzmuraczewski", "password"); // TODO move to config
 
-            var paste = user.CreatePasteAsync(message).Result;
+            var paste = await user.CreatePasteAsync(message);
 
             return paste;
         }

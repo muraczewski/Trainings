@@ -1,20 +1,14 @@
 ﻿using Amazon;
 using Common;
 using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MessageProducer
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            // TODO move to constants file
-            var correctAnswers = new List<char>
-            {
-                'y', 'Y', 'n', 'N'
-            };
-
             var sqs = new AmazonSQSClientWrapper(RegionEndpoint.EUCentral1, "gmuraczewski-queue"); // TODO move gmuraczewski-queue to config or put from console
             Console.WriteLine("AWS SQS Producer");
 
@@ -32,11 +26,12 @@ namespace MessageProducer
                 {
                     answer = Console.ReadKey();
                     Console.WriteLine();
-                } while (!correctAnswers.Contains(answer.KeyChar));
+                } while (!Constants.ConsoleCorrectAnswers.Contains(answer.KeyChar));
 
-                if (answer.KeyChar == 'y' || answer.KeyChar == 'Y')
+
+                if (Constants.ConsolePositiveAnswers.Contains(answer.KeyChar))
                 {
-                    sqs.SendMessage(message, new System.Threading.CancellationToken());
+                    await sqs.SendMessageAsync(message, new System.Threading.CancellationToken());
                 }
             }
         }

@@ -3,6 +3,7 @@ using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Common
 {
@@ -17,7 +18,7 @@ namespace Common
             _sourceEmail = sourceEmail;
         }
 
-        public SendEmailResponse SendMessage(List<string> recipients, string subject, string message, CancellationToken cancellationToken)
+        public async Task<SendEmailResponse> SendMessageAsync(List<string> recipients, string subject, string message, CancellationToken cancellationToken)
         {
             try
             {
@@ -34,11 +35,11 @@ namespace Common
                         },
                     },
                 };
-                var response = _client.SendEmailAsync(sendRequest, cancellationToken).Result;
+                var response = await _client.SendEmailAsync(sendRequest, cancellationToken);
 
                 return response;
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 return new SendEmailResponse
                 {

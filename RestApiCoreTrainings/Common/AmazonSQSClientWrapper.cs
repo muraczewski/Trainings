@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
@@ -27,27 +28,36 @@ namespace Common
             _queueUrl = _sqsClient.GetQueueUrlAsync(queueName).Result.QueueUrl;
         }
 
-        public void SendMessage(string message, CancellationToken cancellationToken)
+        public async Task SendMessageAsync(string message, CancellationToken cancellationToken)
         {
+            var messageSize = System.Text.Encoding.Unicode.GetByteCount(message);
+
+            if (messageSize > Constants.MaximumSQSMessageSize)
+            {
+                Console.WriteLine("Message to long");
+                return;
+            }
+
             Console.WriteLine($"Sending a message to {_sqsRequest.QueueName}\n");
             var sendMessageRequest = new SendMessageRequest(_createQueueResponse.QueueUrl, message);
-            _sqsClient.SendMessageAsync(sendMessageRequest, cancellationToken);
+
+            await _sqsClient.SendMessageAsync(sendMessageRequest, cancellationToken);
             Console.WriteLine($"Finish sending message to {_sqsRequest.QueueName}\n");            
         }
 
-        public Message ReceiveMessage() 
+        public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken) 
         {
             var receiveMessageRequest = new ReceiveMessageRequest(_queueUrl);
 
-            var receivedMessageResponse = _sqsClient.ReceiveMessageAsync(receiveMessageRequest).Result.Messages.FirstOrDefault();
+            var receivedMessageResponse = await _sqsClient.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
 
-            return receivedMessageResponse;
+            return receivedMessageResponse.Messages.FirstOrDefault();
         }
 
-        public void DeleteMessage(string receiptHandle)
+        public async Task DeleteMessageAsync(string receiptHandle, CancellationToken cancellationToken)
         {
             var deleteMessageRequest = new DeleteMessageRequest(_queueUrl, receiptHandle);
-            _sqsClient.DeleteMessageAsync(deleteMessageRequest);
+            await _sqsClient.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
         }
     }
 }
