@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestApiCoreTrainings", "RestApiCoreTrainings\RestApiCoreTrainings.csproj", "{4DC74BDD-4437-43E5-A57F-B53740498EE5}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageProducer", "MessageP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageConsumer", "MessageConsumer\MessageConsumer.csproj", "{A09111D1-A908-41F5-8604-E3412D26B813}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{526BB31C-F323-4D18-9753-2B5D6B8FA826}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{526BB31C-F323-4D18-9753-2B5D6B8FA826}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSWrappers", "AwsWrappers\AWSWrappers.csproj", "{CE3984AC-F702-48AC-BC43-CC8467EF9EC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{526BB31C-F323-4D18-9753-2B5D6B8FA826}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{526BB31C-F323-4D18-9753-2B5D6B8FA826}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{526BB31C-F323-4D18-9753-2B5D6B8FA826}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE3984AC-F702-48AC-BC43-CC8467EF9EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE3984AC-F702-48AC-BC43-CC8467EF9EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE3984AC-F702-48AC-BC43-CC8467EF9EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE3984AC-F702-48AC-BC43-CC8467EF9EC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

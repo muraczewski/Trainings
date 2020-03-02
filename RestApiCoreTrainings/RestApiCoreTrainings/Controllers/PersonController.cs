@@ -1,8 +1,10 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
+using Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RestApiCoreTrainings.Controllers
@@ -19,7 +21,7 @@ namespace RestApiCoreTrainings.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Post([FromBody]Person person, CancellationToken cancellationToken)
         {
@@ -64,71 +66,12 @@ namespace RestApiCoreTrainings.Controllers
             return BadRequest("Delete person failed");
         }
 
-        [HttpGet("Pagination_InServiceLayer")]
+        [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> GetPeople(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
-        {
-            var pagedResult = await _personService.GetPeopleAsync(pageIndex, pageSize, cancellationToken);
-
-            if (pagedResult.TotalItems == 0)
+        public async Task<ActionResult> GetPeople(CancellationToken cancellationToken, int pageIndex = 1, int pageSize = 5)
             {
-                return NoContent();
-            }
-
-            return Ok(new
-            {
-                pagedResult.TotalItems,
-                pagedResult.TotalPages,
-                pagedResult.PageIndex,
-                pagedResult.HasPreviousPage,
-                pagedResult.HasNextPage,
-                pagedResult.Items
-            });
-        }
-
-        [HttpGet("Pagination_InPagedResult")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> GetPeople2(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
-        {
-            var pagedResult = await _personService.GetPeopleAsync2(pageIndex, pageSize, cancellationToken);
-
-            if (pagedResult.TotalItems == 0)
-            {
-                return NoContent();
-            }
-
-            return Ok(new
-            {
-                pagedResult.TotalItems,
-                pagedResult.TotalPages,
-                pagedResult.PageIndex,
-                pagedResult.HasPreviousPage,
-                pagedResult.HasNextPage,
-                pagedResult.Items
-            });
-        }
-
-        [HttpGet("Pagination_InControllerLayer")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> GetPeople3(CancellationToken cancellationToken, int? pageIndex = 1, int pageSize = 5)
-        {
-            if (pageIndex == null)
-            {
-                var allPeople = await _personService.GetPeopleAsync(cancellationToken);
-                if (allPeople.Count == 0)
-                {
-                    return NoContent();
-                }
-
-                return Ok(allPeople);
-            }
-
             var pagedResult = await _personService.GetPeopleAsync(pageIndex, pageSize, cancellationToken);
 
             if (pagedResult.TotalItems == 0)

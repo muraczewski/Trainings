@@ -1,19 +1,22 @@
-﻿using BusinessLayer.Interfaces;
+﻿using System;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLayer.Services
 {
     public class PersonService : IPersonService
     {
+        private readonly ILogger<PersonService> _logger;
         private readonly ConcurrentDictionary<int, Person> _people;
 
-        public PersonService()
+        public PersonService(ILogger<PersonService> logger)
         {
+            _logger = logger;
             _people = new ConcurrentDictionary<int, Person>();
 
             for (int i = 1; i < 20; i++)
@@ -22,14 +25,10 @@ namespace BusinessLayer.Services
             }
         }
 
-        public async Task AddOrUpdatePersonAsync(Person person, CancellationToken cancellationToken)
-        {
-            await Task.Run(() => _people.AddOrUpdate(person.Id, person, null));            
-        }
-
         public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken)
         {
             var person = _people.GetValueOrDefault(id);
+            _logger.LogInformation("Message1 {Person.Age} {Person.ID}", person.Age, person.Id, person);
             return await Task.FromResult(person);
         }
 
@@ -39,6 +38,11 @@ namespace BusinessLayer.Services
             await Task.Run(() => isSuccess = _people.TryAdd(person.Id, person), cancellationToken);
 
             return isSuccess;
+        }
+
+        public async Task AddPersonAsync(Person person, CancellationToken cancellationToken)
+        {
+            await Task.Run(() => _people.TryAdd(person.Id, person), cancellationToken);
         }
 
         public async Task<bool> TryRemovePersonAsync(int personId, CancellationToken cancellationToken)
@@ -77,29 +81,10 @@ namespace BusinessLayer.Services
             }
         }
 
-
-        public async Task<PagedList<Person>> GetPeopleAsync(int? pageIndex, int pageSize, CancellationToken cancellationToken)
-        {
-            if (pageIndex == null)
+        public async Task<PagedList<Person>> GetPeopleAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
             {
-                var allPeople = PagedList<Person>.GetPage(_people.Values, 1, _people.Count);
-                return await Task.FromResult(allPeople);
-            }
-
-            var onePage = PagedList<Person>.GetPage(_people.Values, pageIndex.Value, pageSize);
+            var onePage = PagedList<Person>.GetPage(_people.Values, pageIndex, pageSize);
             return await Task.FromResult(onePage);
-        }
-
-        public async Task<PagedList2<Person>> GetPeopleAsync2(int? pageIndex, int pageSize, CancellationToken cancellationToken)
-        {
-            var pagedResult = PagedList2<Person>.GetPage(_people.Values, pageIndex.Value, pageSize);
-            return await Task.FromResult(pagedResult);
-        }
-
-        public async Task<List<Person>> GetPeopleAsync(CancellationToken cancellationToken)
-        {
-            var result = _people.Values.ToList();
-            return await Task.FromResult(result);
         }
     }
 }
