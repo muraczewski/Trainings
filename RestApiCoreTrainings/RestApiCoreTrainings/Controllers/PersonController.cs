@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using BusinessLayer.Attributes;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models;
 using Common.Exceptions;
@@ -101,7 +103,9 @@ namespace RestApiCoreTrainings.Controllers
                 return NoContent();
             }
 
-            return Ok(person);
+            var classBugReport = typeof(Person).GetCustomAttributes<BugReportAttribute>();
+            var propertyBugReport = typeof(Person).GetProperty("Age")?.GetCustomAttributes<BugReportAttribute>();
+            return Ok(new { person, classBugReport, propertyBugReport });
         }
 
         [HttpPatch]
