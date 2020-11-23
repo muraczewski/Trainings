@@ -18,11 +18,11 @@ namespace BusinessLayer.Services
         {
             _logger = logger;
             _people = new ConcurrentDictionary<int, Person>();
-
-            for (int i = 1; i < 20; i++)
+            
+/*            for (int i = 1; i < 20; i++)
             {
                 _people.TryAdd(i, new Person(i));
-            }
+            }*/
         }
 
         public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken)
@@ -82,7 +82,7 @@ namespace BusinessLayer.Services
         }
 
         public async Task<PagedList<Person>> GetPeopleAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
-            {
+        {
             var onePage = PagedList<Person>.GetPage(_people.Values, pageIndex, pageSize);
             return await Task.FromResult(onePage);
         }

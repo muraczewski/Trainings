@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreTrainings", "CoreTrainings\CoreTrainings.csproj", "{D3C59DE8-28FB-4708-9E35-7BB231E4C440}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreTrainings", "CoreTrainings\CoreTrainings.csproj", "{D3C59DE8-28FB-4708-9E35-7BB231E4C440}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{4691BC9F-B586-4184-B5C1-AB5368339DBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{4691BC9F-B586-4184-B5C1-AB5368339DBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comparers", "Comparers\Comparers.csproj", "{6058DF27-1969-41C4-B44B-9575D7617F11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4691BC9F-B586-4184-B5C1-AB5368339DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4691BC9F-B586-4184-B5C1-AB5368339DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4691BC9F-B586-4184-B5C1-AB5368339DBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6058DF27-1969-41C4-B44B-9575D7617F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6058DF27-1969-41C4-B44B-9575D7617F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6058DF27-1969-41C4-B44B-9575D7617F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6058DF27-1969-41C4-B44B-9575D7617F11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,28 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.SQS;
+using AwsWrappers.Interfaces;
+using AwsWrappers.Services;
 using Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MessageConsumer
 {
     class Program
     {
-        static async Task Main(string[] args)
-        {
-            List<string> Recipients = new List<string>
-            {
-                "grzegorz.muraczewski@gmail.com"
-            };
+        private static IServiceProvider _serviceProvider;
 
-            var sqs = new AmazonSQSClientWrapper(RegionEndpoint.EUCentral1, "gmuraczewski-queue"); // TODO move gmuraczewski-queue to config
+        static async Task Main()
+        {
+            RegisterServices();
+
+            var sqsClientWrapper = _serviceProvider.GetService<ISQSClientWrapper>();
+
             Console.WriteLine("AWS SQS Consumer");
 
             bool shouldExecute = true;
 
             while (shouldExecute)
             {
-                var receivedMessageResponse = await sqs.ReceiveMessageAsync(new System.Threading.CancellationToken());
+                var receivedMessageResponse = await sqsClientWrapper.ReceiveMessageAsync(new CancellationToken());
 
                 if (receivedMessageResponse == null)
                 {
@@ -34,13 +39,18 @@ namespace MessageConsumer
                 var pasteBinWrapper = new PastebinWrapper();
                 var paste = await pasteBinWrapper.CreateBinAsync(receivedMessageResponse.Body);
 
-                var sesClient = new AmazonSESCLientWrapper(RegionEndpoint.EUWest1, "gmuraczewski@pgs-soft.com");
-                var response = await sesClient.SendMessageAsync(Recipients, "New bin on pastebin was added", paste.Url, new System.Threading.CancellationToken());
+                var sesClient = new AmazonSESClientWrapper(RegionEndpoint.EUWest1, "gmuraczewski@pgs-soft.com");    // TODO remove harcoded values
+                var response = await sesClient.SendMessageAsync(Constants.Recipients, "New bin on pastebin was added", paste.Url, new CancellationToken());
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    Console.WriteLine("Email sent succesfully");
-                    await sqs.DeleteMessageAsync(receivedMessageResponse.ReceiptHandle, new System.Threading.CancellationToken());
+                    Console.WriteLine("Email sent successfully");
+                    var result = await sqsClientWrapper.DeleteMessageAsync(receivedMessageResponse.ReceiptHandle, new CancellationToken());
+
+                    if (!result.IsSuccess)
+                    {
+                        Console.WriteLine("Problem with deleting message from queue");
+                    }
                 }
                 else
                 {
@@ -62,6 +72,22 @@ namespace MessageConsumer
                     shouldExecute = false;
                 }
             }
+        }
+
+        private static void RegisterServices()
+        {
+            var awsOptions = new AWSOptions
+            {
+                Profile = "default",
+                Region = RegionEndpoint.EUCentral1,
+            };
+
+            _serviceProvider = new ServiceCollection()
+                .AddScoped<ISQSClientWrapper, SQSClientWrapper>()
+                .AddDefaultAWSOptions(awsOptions)
+                .AddAWSService<IAmazonSQS>()
+                .AddSingleton<ISQSProvider>(s => new SQSProvider("https://sqs.eu-central-1.amazonaws.com/890769921003/gmuraczewski-queue", "gmuraczewski-queue"))
+                .BuildServiceProvider();
         }
     }
 }

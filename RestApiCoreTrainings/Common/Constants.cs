@@ -12,6 +12,11 @@ namespace Common
 
         public static ICollection<char> ConsoleNegativeAnswers => new Collection<char> { 'n', 'N' };
 
-        public static int MaximumSQSMessageSize => 262144;
+        public static int MaximumSqsMessageSize => 262144;
+
+        public static List<string> Recipients = new List<string>
+        {
+            "grzegorz.muraczewski@gmail.com"
+        };
     }
 }

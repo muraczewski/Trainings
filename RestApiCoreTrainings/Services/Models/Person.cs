@@ -1,4 +1,7 @@
-﻿using BusinessLayer.Attributes;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using BusinessLayer.Attributes;
+using BusinessLayer.Attributes.Validation;
 
 namespace BusinessLayer.Models
 {
@@ -20,6 +23,10 @@ namespace BusinessLayer.Models
         public string FirstName { get; set; }
 
         public string Surname { get; set; }
+
+        [EmailAddress(ErrorMessage = "Email is not valid")]
+        [EmailDomainValidation("pgs-soft.com", ErrorMessage = "Email domain must be pgs-soft.com")]
+        public string Email { get; set; }
 
         [BugReport("There is no validation for Age lower than 0")]
         [BugReport("There is no validation for Age higher than 130")]

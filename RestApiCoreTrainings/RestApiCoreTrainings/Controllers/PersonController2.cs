@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace RestApiCoreTrainings.Controllers
 {
     [Produces("application/json")]
-    [Route("api/people")]
-    public class PersonController : Controller
+    [Route("api/people2")]
+    public class PersonController2 : Controller
     {
         private readonly IPersonService _personService;
 
-        public PersonController(IPersonService personService)
+        public PersonController2(IPersonService personService)
         {
             _personService = personService;
         }
@@ -27,11 +27,6 @@ namespace RestApiCoreTrainings.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Post([FromBody]Person person, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var isSuccess = await _personService.TryAddPersonAsync(person, cancellationToken);
             
             if (!isSuccess)

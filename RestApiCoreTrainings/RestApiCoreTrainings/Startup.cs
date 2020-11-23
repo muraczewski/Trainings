@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Amazon.S3;
+using Amazon.SQS;
+using AwsWrappers.Interfaces;
+using AwsWrappers.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,8 +11,8 @@ using BusinessLayer.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using RestApiCoreTrainings.Filters;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Debug;
 using Microsoft.Extensions.Logging.Console;
+using RestApiCoreTrainings.Middlewares;
 
 namespace RestApiCoreTrainings
 {
@@ -27,9 +31,7 @@ namespace RestApiCoreTrainings
             services.AddMvc(options =>
             {
                 options.Filters.Add<LogExceptionFilter>();
-                options.Filters.Add<LogAsyncExceptionFilter>();
                 options.Filters.Add<LogActionFilter>();
-                options.Filters.Add<LogAsyncActionFilter>();
             });
 
             services.AddSingleton<IPersonService, PersonService>();
@@ -38,6 +40,12 @@ namespace RestApiCoreTrainings
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
+
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonSQS>();
+            services.AddAWSService<IAmazonS3>();
+            services.AddSingleton<ISQSProvider>(s => new SQSProvider("https://sqs.eu-central-1.amazonaws.com/890769921003/gmuraczewski-queue", "gmuraczewski-queue"));
+            services.AddScoped<ISQSClientWrapper, SQSClientWrapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,8 +55,10 @@ namespace RestApiCoreTrainings
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseHttpMiddleware();
             app.UseMvc();
+
+
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

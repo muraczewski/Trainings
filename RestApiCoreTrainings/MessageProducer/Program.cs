@@ -1,15 +1,25 @@
-﻿using Amazon;
-using Common;
+﻿using Common;
 using System;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.SQS;
+using AwsWrappers.Interfaces;
+using AwsWrappers.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MessageProducer
 {
     class Program
     {
-        static async Task Main(string[] args)
+        private static IServiceProvider _serviceProvider;
+
+        static async Task Main()
         {
-            var sqs = new AmazonSQSClientWrapper(RegionEndpoint.EUCentral1, "gmuraczewski-queue"); // TODO move gmuraczewski-queue to config or put from console
+            RegisterServices();
+
+            var sqsClientWrapper = _serviceProvider.GetService<ISQSClientWrapper>();
+
             Console.WriteLine("AWS SQS Producer");
 
             while (true)
@@ -31,9 +41,27 @@ namespace MessageProducer
 
                 if (Constants.ConsolePositiveAnswers.Contains(answer.KeyChar))
                 {
-                    await sqs.SendMessageAsync(message, new System.Threading.CancellationToken());
+                    var result = await sqsClientWrapper.SendMessageAsync(message, new System.Threading.CancellationToken());
+                    Console.WriteLine(result.Message);
                 }
             }
+        }
+
+        // todo here should be hostBuilder
+        private static void RegisterServices()
+        {
+            var awsOptions = new AWSOptions
+            {
+                Profile = "default",
+                Region = RegionEndpoint.EUCentral1,
+            };
+
+            _serviceProvider = new ServiceCollection()
+                .AddScoped<ISQSClientWrapper, SQSClientWrapper>()
+                .AddDefaultAWSOptions(awsOptions)
+                .AddAWSService<IAmazonSQS>()
+                .AddSingleton<ISQSProvider>(s => new SQSProvider("https://sqs.eu-central-1.amazonaws.com/890769921003/gmuraczewski-queue", "gmuraczewski-queue"))
+                .BuildServiceProvider();
         }
     }
 }

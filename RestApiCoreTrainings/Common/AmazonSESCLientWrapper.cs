@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    public class AmazonSESCLientWrapper
+    public class AmazonSESClientWrapper
     {
         private readonly AmazonSimpleEmailServiceClient _client;
         private readonly string _sourceEmail;
 
-        public AmazonSESCLientWrapper(RegionEndpoint regionEndpoint, string sourceEmail)
+        public AmazonSESClientWrapper(RegionEndpoint regionEndpoint, string sourceEmail)
         {
             _client = new AmazonSimpleEmailServiceClient(regionEndpoint);
             _sourceEmail = sourceEmail;
