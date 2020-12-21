@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace RestApiCoreTrainings.IntegrationTests
 {
+    // TODO check how 
     [TestFixture]
     public class PersonControllerTests : TestBase
     {
@@ -38,6 +39,7 @@ namespace RestApiCoreTrainings.IntegrationTests
 
             // then
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.Headers.
         }
     }
 }

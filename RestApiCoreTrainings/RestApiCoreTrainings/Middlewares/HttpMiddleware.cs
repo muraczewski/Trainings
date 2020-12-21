@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RestApiCoreTrainings.Middlewares
@@ -11,9 +12,10 @@ namespace RestApiCoreTrainings.Middlewares
     {
         private readonly RequestDelegate _next;
 
+        // todo fix this to work swagger
         private List<string> acceptablePaths = new List<string>
         {
-            "/swagger/v1/swagger.json", "/api/people", "/swagger/index.html"
+            "/swagger/v1/swagger.json", "/api/people", "/swagger/index.html", "/swagger"
         };
 
         public HttpMiddleware(RequestDelegate next)
@@ -28,7 +30,8 @@ namespace RestApiCoreTrainings.Middlewares
                 return _next(httpContext);
             }
 
-            return null;
+            httpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return Task.CompletedTask;
         }
     }
 

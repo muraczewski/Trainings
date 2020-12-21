@@ -13,6 +13,7 @@ namespace RestApiCoreTrainings.IntegrationTests
         {
             _server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
             _client = _server.CreateClient();
+            _client.DefaultRequestHeaders
         }
     }
 }

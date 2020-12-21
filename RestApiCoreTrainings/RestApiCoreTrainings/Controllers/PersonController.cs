@@ -82,6 +82,7 @@ namespace RestApiCoreTrainings.Controllers
         {
             var pagedResult = await _personService.GetPeopleAsync(pageIndex, pageSize, cancellationToken);
             
+            // TODO best practice - return empty list instead of NoContent
             if (pagedResult.TotalItems == 0)
             {
                 return NoContent();
